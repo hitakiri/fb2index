@@ -91,7 +91,7 @@ func initDB() {
 			CREATE INDEX IF NOT EXISTS book_sequences_idx ON book_sequences (sequence_id);
 			CREATE INDEX IF NOT EXISTS authors_idx ON authors (last_name, first_name, nickname);
 
-			INSERT OR REPLACE INTO genres (name, desc, meta) VALUES
+			INSERT OR IGNORE INTO genres (name, desc, meta) VALUES
 				('adv_animal', 'Природа и животные', 'Приключения'),
 				('adventure', 'Приключения', 'Приключения'),
 				('adv_geo', 'Путешествия и география', 'Приключения'),
