@@ -9,7 +9,7 @@ fb2index [![License](http://img.shields.io/:license-gpl3-blue.svg)](http://www.g
 
 Собирается приложение традиционно, с помощью `go get` (перед этим нужно установить [Go](https://golang.org/)):
 
-    go get github.com/opennota/fb2index
+    go get -u github.com/opennota/fb2index
 
 Из-за использования базы данных SQLite3, написанной на C, сборка под Windows несколько сложнее и потребует также установки [MinGW](http://www.mingw.org/).
 
