@@ -322,6 +322,93 @@ func initDB() {
 				('unfinished', 'Незавершенное', 'Прочее'),
 				('vaudeville', 'Мистерия, буффонада, водевиль', 'Драматургия');
 	`)
+
+	// Make trigram indexes from the existing data.
+
+	// Authors
+
+	type author struct {
+		ID         uint32
+		FirstName  string `db:"first_name"`
+		MiddleName string `db:"middle_name"`
+		LastName   string `db:"last_name"`
+		Nickname   string
+	}
+	var authors []author
+	err := db.Select(&authors, "SELECT * FROM authors ORDER BY id")
+	if err != nil {
+		log.Fatal(err)
+	}
+	mAuthors := make(map[uint32][]trigram.T, len(authors))
+	for _, a := range authors {
+		tt := trigram.Extract(a.FirstName)
+		tt = append(tt, trigram.Extract(a.MiddleName)...)
+		tt = append(tt, trigram.Extract(a.LastName)...)
+		tt = append(tt, trigram.Extract(a.Nickname)...)
+		mAuthors[a.ID] = tt
+		trgmAuthorIndex.AddTrigrams(a.ID, tt)
+	}
+
+	// Sequences
+
+	type sequence struct {
+		Name string
+		ID   uint32
+	}
+	var sequences []sequence
+	err = db.Select(&sequences, "SELECT * FROM sequences ORDER BY id")
+	if err != nil {
+		log.Fatal(err)
+	}
+	mSequences := make(map[uint32][]trigram.T, len(sequences))
+	for _, s := range sequences {
+		tt := trigram.Extract(s.Name)
+		mSequences[s.ID] = tt
+		trgmSequenceIndex.AddTrigrams(s.ID, tt)
+	}
+
+	// Books
+
+	type book struct {
+		ID    uint32
+		Title string
+	}
+	var books []book
+	err = db.Select(&books, "SELECT id, title FROM books ORDER BY id")
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, b := range books {
+		trgmBookIndex.Add(b.ID, b.Title)
+
+		var authorIDs []uint32
+		var translatorIDs []uint32
+		var sequenceIDs []uint32
+
+		err := db.Select(&authorIDs, "SELECT author_id FROM book_authors WHERE book_id = ? ORDER BY author_id", b.ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, id := range authorIDs {
+			trgmBookIndex.AddTrigrams(b.ID, mAuthors[id])
+		}
+
+		err = db.Select(&translatorIDs, "SELECT author_id FROM book_translators WHERE book_id = ? ORDER BY author_id", b.ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, id := range translatorIDs {
+			trgmBookIndex.AddTrigrams(b.ID, mAuthors[id])
+		}
+
+		err = db.Select(&sequenceIDs, "SELECT sequence_id FROM book_sequences WHERE book_id = ? ORDER BY sequence_id", b.ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, id := range sequenceIDs {
+			trgmBookIndex.AddTrigrams(b.ID, mSequences[id])
+		}
+	}
 }
 
 func insertWorker(tx *sqlx.Tx, books <-chan book, done chan<- bool) {
