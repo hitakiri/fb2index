@@ -110,6 +110,10 @@ func (idx Index) Add(id uint32, s string) {
 
 // AddTrigrams adds a slice of trigrams under the given ID.
 func (idx Index) AddTrigrams(id uint32, tt []T) {
+	if len(tt) == 0 {
+		return
+	}
+
 	allIDs := idx[tAllIDs]
 	l := len(allIDs)
 	if l > 0 && allIDs[l-1] > id {

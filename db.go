@@ -502,7 +502,7 @@ func indexBook(tx *sqlx.Tx, b book) error {
 		return err
 	}
 
-	var trigrams [][]trigram.T
+	var trigrams []trigram.T
 
 	for _, g := range b.Genres {
 		genreID, _, err := getOrInsertGenre(tx, g.Name)
@@ -530,10 +530,8 @@ func indexBook(tx *sqlx.Tx, b book) error {
 		if inserted {
 			for _, s := range []string{a.FirstName, a.MiddleName, a.LastName, a.Nickname} {
 				trgm := trigram.Extract(s)
-				if len(trgm) > 0 {
-					trgmAuthorIndex.AddTrigrams(authorID, trgm)
-					trigrams = append(trigrams, trgm)
-				}
+				trgmAuthorIndex.AddTrigrams(authorID, trgm)
+				trigrams = append(trigrams, trgm...)
 			}
 		}
 	}
@@ -552,10 +550,8 @@ func indexBook(tx *sqlx.Tx, b book) error {
 		if inserted {
 			for _, s := range []string{a.FirstName, a.MiddleName, a.LastName, a.Nickname} {
 				trgm := trigram.Extract(s)
-				if len(trgm) > 0 {
-					trgmAuthorIndex.AddTrigrams(authorID, trgm)
-					trigrams = append(trigrams, trgm)
-				}
+				trgmAuthorIndex.AddTrigrams(authorID, trgm)
+				trigrams = append(trigrams, trgm...)
 			}
 		}
 	}
@@ -573,16 +569,12 @@ func indexBook(tx *sqlx.Tx, b book) error {
 
 		if inserted {
 			trgm := trigram.Extract(s.Name)
-			if len(trgm) > 0 {
-				trgmSequenceIndex.AddTrigrams(seqID, trgm)
-				trigrams = append(trigrams, trgm)
-			}
+			trgmSequenceIndex.AddTrigrams(seqID, trgm)
+			trigrams = append(trigrams, trgm...)
 		}
 	}
 
-	for _, trgm := range trigrams {
-		trgmBookIndex.AddTrigrams(bookID, trgm)
-	}
+	trgmBookIndex.AddTrigrams(bookID, trigrams)
 	trgmBookIndex.Add(bookID, b.Title)
 
 	return nil
