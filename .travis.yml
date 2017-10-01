@@ -8,7 +8,6 @@ go:
 install:
   - go get github.com/jmoiron/sqlx
   - go get github.com/mattn/go-sqlite3
-  - go get github.com/opennota/zip
   - go get github.com/rogpeppe/go-charset/charset
   - go get github.com/rogpeppe/go-charset/data
   - go build ./...

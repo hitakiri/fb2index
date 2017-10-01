@@ -14,13 +14,12 @@
 package main
 
 import (
+	"archive/zip"
 	"compress/flate"
 	"io"
 	"log"
 	"os"
 	"sync"
-
-	"github.com/opennota/zip"
 )
 
 type book struct {
