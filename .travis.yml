@@ -1,0 +1,18 @@
+language: go
+sudo: false
+
+go:
+  - 1.x
+  - master
+
+install:
+  - go get github.com/jmoiron/sqlx
+  - go get github.com/mattn/go-sqlite3
+  - go get github.com/opennota/zip
+  - go get github.com/rogpeppe/go-charset
+  - go build ./...
+
+script:
+  - test -z "$(gofmt -l . | tee /dev/stderr)"
+  - go test -v ./...
+
