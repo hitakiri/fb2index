@@ -95,7 +95,7 @@ func bookDownload(w http.ResponseWriter, b *book) error {
 
 	w.Header().Add("Content-Type", "application/fb2")
 	w.Header().Add("Content-Encoding", "deflate")
-	w.Header().Add("Content-Length", strconv.FormatInt(b.CompressedSize, 10))
+	w.Header().Add("Content-Length", fmt.Sprint(b.CompressedSize))
 	w.Header().Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%d.fb2"`, b.ID))
 	_, err = io.Copy(w, r)
 
