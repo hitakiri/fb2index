@@ -184,10 +184,10 @@ loop:
 			case "title-info":
 				inTitleInfo = true
 			case "genre":
-				g := text(d, tok.Name)
+				g := normalizeGenre(text(d, tok.Name))
 				if validGenre(g) {
 					desc.Genres = append(desc.Genres, genre{
-						Name: normalizeGenre(g),
+						Name: g,
 					})
 				}
 			case "author", "translator":
