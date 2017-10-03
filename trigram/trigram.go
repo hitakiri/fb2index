@@ -104,8 +104,7 @@ func Extract(s string) []T {
 
 // Add adds a string under the given ID.
 func (idx Index) Add(id uint32, s string) {
-	tt := Extract(s)
-	idx.AddTrigrams(id, tt)
+	idx.AddTrigrams(id, Extract(s))
 }
 
 // AddTrigrams adds a slice of trigrams under the given ID.
@@ -134,8 +133,7 @@ func (idx Index) AddTrigrams(id uint32, tt []T) {
 
 // Query returns a slice of IDs that match the trigrams in the query s.
 func (idx Index) Query(s string) []uint32 {
-	tt := Extract(s)
-	return idx.QueryTrigrams(tt)
+	return idx.QueryTrigrams(Extract(s))
 }
 
 type byRelevance struct {
