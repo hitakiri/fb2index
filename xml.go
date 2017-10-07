@@ -345,7 +345,6 @@ func parseBinary(d *xml.Decoder) ([]byte, error) {
 		case xml.EndElement:
 			if tok.Name.Local == "binary" {
 				return ioutil.ReadAll(base64.NewDecoder(base64.StdEncoding, &buf))
-
 			}
 		}
 	}
