@@ -20,6 +20,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"path"
 	"regexp"
 	"strconv"
@@ -477,6 +478,27 @@ func robotsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("User-agent: *\nDisallow: /\n"))
 }
 
+func cssHandler(w http.ResponseWriter, r *http.Request) {
+	if *cssPath == "" {
+		http.NotFound(w, r)
+		return
+	}
+
+	f, err := os.Open(*cssPath)
+	if err != nil {
+		httpError(w, r, err)
+		return
+	}
+	defer f.Close()
+
+	w.Header().Add("Content-Type", "text/css")
+	w.Header().Add("Content-Encoding", "identity")
+	if _, err := io.Copy(w, f); err != nil {
+		logError(r, err)
+		return
+	}
+}
+
 func listenAndServe() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/b", bookHandler)
@@ -486,6 +508,7 @@ func listenAndServe() {
 	http.HandleFunc("/search", searchHandler)
 	http.HandleFunc("/i/", imageHandler)
 	http.HandleFunc("/robots.txt", robotsHandler)
+	http.HandleFunc("/external.css", cssHandler)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
 

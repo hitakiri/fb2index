@@ -34,6 +34,8 @@ var (
 	authorsPerPage   = flag.Int("app", 50, "Authors per page")
 	sequencesPerPage = flag.Int("spp", 50, "Sequences per page")
 
+	cssPath = flag.String("css", "", "Use CSS file")
+
 	allowedLanguages []string
 
 	indexed int

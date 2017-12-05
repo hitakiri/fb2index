@@ -144,6 +144,7 @@ var base = `
     }
     {{ template "styles" }}
   </style>
+  <link rel="stylesheet" type="text/css" href="/external.css">
 </head>
 <body>
   <header>
